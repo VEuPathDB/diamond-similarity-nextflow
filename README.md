@@ -1,2 +1,2 @@
 # diamondSimilarity
-Nextflow workflow substituting diamond for blast
+Conversion of blastSimilarity workflow to use diamond and remove regex depedencies
