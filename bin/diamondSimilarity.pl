@@ -76,6 +76,7 @@ while (my $line = <$data>) {
                 $nonOverlappingPercent = ($qlen - $gaps)/$qlen * 100;
 		$roundedPercent = sprintf("%.2f", $nonOverlappingPercent);
 	    }
+	    $qstrand eq '+' ? $qstrand = 0 : $qstrand = 1;
             if ($printSum) {
 		print OUT "  Sum: $sseqid:$bitscore:$evalue:$sstart:$send:$qstart:$qend:1:$length:$nident:$positive:$qstrand:$qframe:$qlen:$slen:$roundedPercent\n";
 	    }
@@ -102,9 +103,11 @@ while (my $line = <$data>) {
                   $nonOverlappingPercent = ($qlen - $gaps)/$qlen * 100;
 		  $roundedPercent = sprintf("%.2f", $nonOverlappingPercent);
 	      }
+	      $qstrand eq '+' ? $qstrand = 0 : $qstrand = 1;
 	      if ($printSum) {
 		  print OUT "  Sum: $sseqid:$bitscore:$evalue:$sstart:$send:$qstart:$qend:1:$length:$nident:$positive:$qstrand:$qframe:$qlen:$slen:$roundedPercent\n";
 	      }
+	      $qstrand eq '+' ? $qstrand = 0 : $qstrand = 1;
               if ($printSpan) {
 		  print OUT "   HSP1: $sseqid:$nident:$positive:$length:$bitscore:$evalue:$sstart:$send:$qstart:$qend:$qstrand:$qframe\n";
 	      }
