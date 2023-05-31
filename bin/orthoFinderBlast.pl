@@ -4,20 +4,20 @@ use strict;
 use warnings;
 use Getopt::Long;
 
-my ($query,$database);
+my ($query,$database,$filePath,$queryNumber,$dataNumber);
 
 &GetOptions("query=s"=> \$query,
             "database=s"=> \$database);
 
 if ($query =~ /^(.+)Species(\d+).fa/) {
-    my $filePath = $1;
-    my $queryNumber = $2;
+    $filePath = $1;
+    $queryNumber = $2;
 }
 else {
     die;
 }
 if ($database =~ /^(.+)Species(\d+).fa/) {
-    my $dataNumber = $2;
+    $dataNumber = $2;
 }
 else {
     die;
