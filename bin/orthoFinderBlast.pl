@@ -23,4 +23,4 @@ else {
     die;
 }
 
-system("diamond blastp --ignore-warnings -d ${filePath}diamondDBSpecies${dataNumber}.dmnd -q ${filePath}Species${queryNumber}.fa -o Blast${dataNumber}_${queryNumber}.txt.gz --more-sensitive -p 1 --quiet -e 0.001 --compress 1");
+system("diamond blastp --ignore-warnings -d ${filePath}diamondDBSpecies${dataNumber}.dmnd -q ${filePath}Species${queryNumber}.fa -o Blast${queryNumber}_${dataNumber}.txt.gz --more-sensitive -p 1 --quiet -e 0.001 --compress 1");
