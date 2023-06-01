@@ -19,6 +19,9 @@ ADD /bin/*.pl /usr/bin/
 RUN chmod +x *
 
 RUN export TZ=America/New_York && \
-ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+mkdir /usr/share/zoneinfo && \
+mkdir /usr/share/zoneinfo/America
+ADD /bin/New_York /usr/share/zoneinfo/America/
+RUN ln -snf /usr/share/zoneinfo/America/New_York /etc/localtime && echo America/New_York > /etc/timezone
 
 WORKDIR /work
