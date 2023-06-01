@@ -18,6 +18,7 @@ ADD /bin/*.pl /usr/bin/
 # Making all tools executable
 RUN chmod +x *
 
-RUN mkdir /etc/localtime
+RUN TZ=America/New_York \
+ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 WORKDIR /work
