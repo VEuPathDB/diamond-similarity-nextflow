@@ -18,4 +18,6 @@ ADD /bin/*.pl /usr/bin/
 # Making all tools executable
 RUN chmod +x *
 
+RUN mkdir /etc/localtime
+
 WORKDIR /work
