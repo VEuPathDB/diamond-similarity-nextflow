@@ -35,8 +35,10 @@ while (my $line = <$data>) {
 	my $roundedPercent;
 	my $qTaxAbbrev = $qseqid;
 	$qTaxAbbrev =~ s/\|.*//g;
+	$qseqid =~ s/\sgene=.*//g;
 	my $sTaxAbbrev = $sseqid;
-	$sTaxAbbrev =~ s/\|.*//g;	
+	$sTaxAbbrev =~ s/\|.*//g;
+	$sseqid =~ s/\sgene=.*//g;
         if ($slen < $qlen) {
             $nonOverlappingPercent = ($slen - $gaps)/$slen * 100;
             $roundedPercent = sprintf("%.2f", $nonOverlappingPercent);
