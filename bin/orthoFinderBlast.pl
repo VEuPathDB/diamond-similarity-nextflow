@@ -4,12 +4,12 @@ use strict;
 use warnings;
 use Getopt::Long;
 
-my ($query,$database,$filePath,$queryNumber,$dataNumber,$previousBlasts,$sequenceIDs,$speciesIDs);
+my ($query,$database,$filePath,$queryNumber,$dataNumber,$previousBlasts,$sequences_id_file,$species_id_file);
 
 &GetOptions("query=s"=> \$query,
             "database=s"=> \$database,
-	    "sequenceIDs=s"=> \$sequenceIDs,
-	    "speciesIDs=s"=> \$speciesIDs
+	    "sequenceIDs=s"=> \$sequences_id_file,
+	    "speciesIDs=s"=> \$species_id_file
            );
 
 # Read species ID file
@@ -54,8 +54,8 @@ else {
 my $queryOrganism = $species_map{$queryNumber};
 my $dataOrganism = $species_map{$dataNumber};
 
-if (-e "/previousBlasts/$queryOrganism_$dataOrganism.txt.gz") {
-    system("cp /previousBlasts/$queryOrganism_$dataOrganism.txt.gz ./Blast$queryNumber_$databaseNumber.txt.gz");
+if (-e "/previousBlasts/${queryOrganism}_${dataOrganism}.txt.gz") {
+    system("cp /previousBlasts/${queryOrganism}_${dataOrganism}.txt.gz ./Blast${queryNumber}_${databaseNumber}.txt.gz");
 }
 else {
     system("diamond blastp --ignore-warnings -d ${filePath}diamondDBSpecies${dataNumber}.dmnd -q ${filePath}Species${queryNumber}.fa -o Blast${queryNumber}_${dataNumber}.txt.gz -f 6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen nident positive qframe qstrand gaps qseq --more-sensitive -p 1 --quiet -e 0.001 --compress 1");
