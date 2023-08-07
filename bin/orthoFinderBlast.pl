@@ -77,7 +77,8 @@ if (-e "/previousBlasts/${queryOrganism}_${dataOrganism}.txt.gz") {
 	$key =~ s/\//\\\//g;
 	$sed_search_string = $sed_search_string . "s/${key}/${new_id}/g;";
 	$sed_string_count += 1;
-	if ($sed_string_count % 1000 == 0) {
+	print "Sedcount is $sed_string_count\n";
+	if ($sed_string_count % 10 == 0) {
 	    print "$sed_search_string\n";
 	    system("sed -i \"${sed_search_string}\" Blast${queryNumber}_${dataNumber}.txt");
 	    $sed_string_count = 0;
