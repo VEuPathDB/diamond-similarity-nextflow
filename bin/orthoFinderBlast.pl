@@ -66,6 +66,9 @@ close $fh_sequences;
 my $queryOrganism = $id_to_species_map{$queryNumber};
 my $dataOrganism = $id_to_species_map{$dataNumber};
 
+my $size = keys %real_to_new_seqs_map;
+print "Size is $size\n";
+
 if (-e "/previousBlasts/${queryOrganism}_${dataOrganism}.txt.gz") {
     system("cp /previousBlasts/${queryOrganism}_${dataOrganism}.txt.gz ./Blast${queryNumber}_${dataNumber}.txt.gz");
     system("gunzip Blast${queryNumber}_${dataNumber}.txt.gz");
@@ -78,7 +81,7 @@ if (-e "/previousBlasts/${queryOrganism}_${dataOrganism}.txt.gz") {
 	$sed_search_string = $sed_search_string . "s/${key}/${new_id}/g;";
 	$sed_string_count += 1;
 	print "Sedcount is $sed_string_count\n";
-	if ($sed_string_count % 10 == 0) {
+	if ($sed_string_count % 100 == 0) {
 	    print "$sed_search_string\n";
 	    system("sed -i \"${sed_search_string}\" Blast${queryNumber}_${dataNumber}.txt");
 	    $sed_string_count = 0;
