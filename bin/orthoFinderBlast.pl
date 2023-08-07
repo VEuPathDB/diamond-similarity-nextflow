@@ -69,11 +69,19 @@ if (-e "/previousBlasts/${queryOrganism}_${dataOrganism}.txt.gz") {
     system("gunzip Blast${queryNumber}_${dataNumber}.txt.gz");
     # Rename files in the output directory
     my $sed_search_string = "";
+    my $sed_string_count = 0;
     foreach my $key (keys %real_to_new_seqs_map) {
 	my $new_id = $real_to_new_seqs_map{$key};
 	$key =~ s/\//\\\//g;
 	$sed_search_string = $sed_search_string . "s/${key}/${new_id}/g;";
+	$sed_string_count += 1;
+	if ($sed_string_count % 1000 == 0) {
+	    system("sed -i \"${sed_search_string}\" Blast${queryNumber}_${dataNumber}.txt");
+	    $sed_string_count = 0;
+	    $sed_search_string = "";
+	}
     }
+    #If happens to end on a multiple of 1000, this will unneededly be rerun
     system("sed -i \"${sed_search_string}\" Blast${queryNumber}_${dataNumber}.txt");
     system("gzip Blast${queryNumber}_${dataNumber}.txt");
 }
