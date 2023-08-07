@@ -65,22 +65,19 @@ my $queryOrganism = $id_to_species_map{$queryNumber};
 my $dataOrganism = $id_to_species_map{$dataNumber};
 
 if (-e "/previousBlasts/${queryOrganism}_${dataOrganism}.txt.gz") {
-    print "From Cache\n";
     system("cp /previousBlasts/${queryOrganism}_${dataOrganism}.txt.gz ./Blast${queryNumber}_${dataNumber}.txt.gz");
     system("gunzip Blast${queryNumber}_${dataNumber}.txt.gz");
     # Rename files in the output directory
+    my $sed_search_string = "";
     foreach my $key (keys %real_to_new_seqs_map) {
-	print "Key is $key\n";
 	my $new_id = $real_to_new_seqs_map{$key};
-	print "New Id is $new_id\n";
 	$key =~ s/\//\\\//g;
-	print "Key fixed is $key\n";
-        system("sed -i \"s/${key}/${new_id}/g\" Blast${queryNumber}_${dataNumber}.txt");
-    }    
+	$sed_search_string = $sed_search_string . "s/${key}/${new_id}/g;";
+    }
+    system("sed -i \"${sed_search_string}\" Blast${queryNumber}_${dataNumber}.txt");
     system("gzip Blast${queryNumber}_${dataNumber}.txt");
 }
 else {
-    print "Calculating New!\n";
     if ($query =~ /^(.+)Species(\d+).fa/) {
         $filePath = $1;
         $queryNumber = $2;
