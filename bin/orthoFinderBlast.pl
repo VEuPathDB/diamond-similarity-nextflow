@@ -6,10 +6,10 @@ use Getopt::Long;
 
 my ($query,$database,$filePath,$queryNumber,$dataNumber,$previousBlasts,$sequences_id_file,$species_id_file);
 
-&GetOptions("query=s"=> \$query,
-            "database=s"=> \$database,
-	    "sequenceIDs=s"=> \$sequences_id_file,
-	    "speciesIDs=s"=> \$species_id_file
+&GetOptions("query=s" => \$query,
+            "database=s" => \$database,
+	    "sequences_id_file=s" => \$sequences_id_file,
+	    "species_id_file=s"=> \$species_id_file
            );
 
 # Read species ID file
@@ -65,27 +65,19 @@ my $queryOrganism = $id_to_species_map{$queryNumber};
 my $dataOrganism = $id_to_species_map{$dataNumber};
 
 if (-e "/previousBlasts/${queryOrganism}_${dataOrganism}.txt.gz") {
+    print "From Cache\n";
     system("cp /previousBlasts/${queryOrganism}_${dataOrganism}.txt.gz ./Blast${queryNumber}_${dataNumber}.txt.gz");
     system("gunzip Blast${queryNumber}_${dataNumber}.txt.gz");
     # Rename files in the output directory
-    open my $inputFile, '<', "Blast${queryNumber}_${dataNumber}.txt" or die "Cannot open \"Blast${queryNumber}_${dataNumber}.txt\": $!";
-    my $new_name_temp = "Blast${queryNumber}_${dataNumber}.txt" . ".temp";
-    open(OUT,">$new_name_temp");
-    while (my $line = <$inputFile>) {
-   	chomp $line;
-	if ($line =~ /^(.*)\t(.*)\t(.+\t.+\t.+\t.+\t.+\t.+\t.+\t.+\t.+\t.+\t.+\t.+\t.+\t.+\t.+\t.+\t.+\t\w+)/) {    
-            my ($organism_first_sequence, $organism_second_sequence, $data) = ($1,$2,$3);
-	    my $new_first_sequence = $real_to_new_seqs_map{$organism_first_sequence};
-	    my $new_second_sequence = $real_to_new_seqs_map{$organism_second_sequence};
-	    print OUT "$new_first_sequence\t$new_second_sequence\t$data\n";
-        }
-	else {
-            die "$line Invalid blast format\n";
-	}
-    }
-    system("mv $new_name_temp Blast${queryNumber}_${dataNumber}.txt");
+    foreach my $key (keys %real_to_new_seqs_map) {
+	print "Key is $key\n";
+	my $new_id = $real_to_new_seqs_map{$key};
+	print "New Id is $new_id\n";
+	$key =~ s/\//\\\//g;
+	print "Key fixed is $key\n";
+        system("sed -i \"s/${key}/${new_id}/g\" Blast${queryNumber}_${dataNumber}.txt");
+    }    
     system("gzip Blast${queryNumber}_${dataNumber}.txt");
-    close OUT;
 }
 else {
     print "Calculating New!\n";
