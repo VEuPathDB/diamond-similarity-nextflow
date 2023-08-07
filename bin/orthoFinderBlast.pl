@@ -35,18 +35,6 @@ while (my $line = <$fh_species>) {
 }
 close $fh_species;
 
-# Read sequences ID file
-open my $fh_sequences, '<', $sequences_id_file or die "Cannot open $sequences_id_file: $!";
-my %real_to_new_seqs_map;
-while (my $line = <$fh_sequences>) {
-    chomp $line;
-    if ($line =~ /^(\d+_\d+):\s+(.+)/) {
-        my ($new, $real) = ($1, $2);
-        $real_to_new_seqs_map{$real} = $new;
-    }
-}
-close $fh_sequences;
-
 if ($query =~ /^(.+)Species(\d+).fa/) {
     $filePath = $1;
     $queryNumber = $2;
@@ -60,6 +48,20 @@ if ($database =~ /^(.+)Species(\d+).fa/) {
 else {
     die;
 }
+
+# Read sequences ID file
+open my $fh_sequences, '<', $sequences_id_file or die "Cannot open $sequences_id_file: $!";
+my %real_to_new_seqs_map;
+while (my $line = <$fh_sequences>) {
+    chomp $line;
+    if ($line =~ /^(\d+_\d+):\s+(.+)/) {
+        my ($new, $real) = ($1, $2);
+	if ($new =~ /${queryNumber}_\d+/ || $new =~ /${dataNumber}_\d+/) {
+	    $real_to_new_seqs_map{$real} = $new;
+	}
+    }
+}
+close $fh_sequences;
 
 my $queryOrganism = $id_to_species_map{$queryNumber};
 my $dataOrganism = $id_to_species_map{$dataNumber};
