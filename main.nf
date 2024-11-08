@@ -5,11 +5,11 @@ nextflow.enable.dsl=2
 // Param Checking 
 //---------------------------------------------------------------
 
-if(params.seqFile) {
-  seqs = Channel.fromPath( params.seqFile ).splitFasta( by:params.fastaSubsetSize, file:true  )
+if(params.queryFastaFile) {
+  seqs = Channel.fromPath( params.queryFastaFile ).splitFasta( by:params.fastaSubsetSize, file:true  )
 }
 else {
-  throw new Exception("Missing params.seqFile")
+  throw new Exception("Missing params.queryFastaFile")
 }
 
 if (params.preConfiguredDatabase) {
@@ -30,13 +30,11 @@ include { preConfiguredDatabase } from './modules/diamondSimilarity.nf'
 //--------------------------------------------------------------------------
 
 workflow {
-  
-  if (!params.preConfiguredDatabase) {
-    nonConfiguredDatabase(seqs)
+  if (params.preConfiguredDatabase) {
+    preConfiguredDatabase(seqs, params.targetDatabaseIndex)
   }
-   
-  else if (params.preConfiguredDatabase) {
-    preConfiguredDatabase(seqs)
+  else {
+    nonConfiguredDatabase(seqs)
   }
 
 }

@@ -3,94 +3,76 @@ nextflow.enable.dsl=2
 
 process createDatabase {
   input:
-    path newdbfasta
+    path fasta
+    val dbname
 
   output:
-    path 'newdb.dmnd'
+  path "${dbname}.dmnd"
 
   script:
-    template 'createDatabase.bash'
+  """
+  filename=$fasta
+  filename_without_suffix="\${filename%.gz}"
+  if [[ "$fasta" == *.gz ]]; then
+    gunzip -d -k --force $fasta
+  fi
+  diamond makedb --in \$filename_without_suffix --db $dbname
+  """
 }
 
 process diamondSimilarity {
   input:
-    path fasta
+    path queryFasta
     path database
-    val pValCutoff 
-    val lengthCutoff 
-    val percentCutoff 
-    val blastProgram  
-    val blastArgs 
-    val adjustMatchLength
-    val outputType
-    val printSimSeqs
 
   output:
     path 'diamondSimilarity.out', emit: output_file
-    path 'diamondSimilarity.log', emit: log_file
 
   script:
-    template 'diamondSimilarity.bash'
+   """
+   diamond $params.blastProgram \
+    -d $database \
+    -q $queryFasta \
+    -o diamondSimilarity.out \
+    ${task.ext.args}
+   """
 }
 
-process sortOutput {
-  publishDir params.outputDir, saveAs: {filename->params.dataFile}, mode: "copy"
-  
+process gzip {
+  publishDir params.outputDir, mode: 'copy'
+
   input:
-    path output
-        
+  path similarities
+  val outputFileName
+
   output:
-    path 'diamondSimilarity.out'
+  path "${outputFileName}.gz"
 
   script:
-    """
-    sed 's/^>/\\x00&/' $output  | sort -z | tr -d '\\0' > diamondSimilarity.out    
-    """
+   """
+   gzip -c $similarities >${outputFileName}.gz
+   """
 }
 
-process sortSimSeqs {
-  publishDir params.outputDir, saveAs: {filename->params.dataFile}, mode: "copy"
-  
-  input:
-    path output
-        
-  output:
-    path 'diamondSimilarity.out'
 
-  script:
-    """
-    cat $output | sort -k 1 > diamondSimilarity.out
-    """
-}
 
 workflow nonConfiguredDatabase {
   take:
     seqs
 
   main:
-    database = createDatabase(params.databaseFasta)
-    diamondSimilarityResults = diamondSimilarity(seqs, database, params.pValCutoff, params.lengthCutoff, params.percentCutoff, params.blastProgram, params.blastArgs, params.adjustMatchLength, params.outputType, params.printSimSeqs)
-    if (params.printSimSeqs) {
-       diamondSimilarityResults.output_file | collectFile(name: 'similarity.out') | sortSimSeqs
-    }
-    else {
-       diamondSimilarityResults.output_file | collectFile(name: 'similarity.out') | sortOutput
-    }
-    diamondSimilarityResults.log_file | collectFile(storeDir: params.outputDir, name: params.logFile)
+    database = createDatabase(params.targetFastaFile, "targetdb")
+
+    preConfiguredDatabase(seqs, database)
 }
 
 workflow preConfiguredDatabase {
   take:
     seqs
+    database
 
   main:
-    diamondSimilarityResults = diamondSimilarity(seqs, params.database, params.pValCutoff, params.lengthCutoff, params.percentCutoff, params.blastProgram, params.blastArgs, params.adjustMatchLength, params.outputType, params.printSimSeqs)
-    if (params.printSimSeqs) {
-       diamondSimilarityResults.output_file | collectFile(name: 'similarity.out') | sortSimSeqs
-    }
-    else {
-       diamondSimilarityResults.output_file | collectFile(name: 'similarity.out') | sortOutput
-    }
-    diamondSimilarityResults.log_file | collectFile(storeDir: params.outputDir, name: params.logFile)
-    
+  sims = diamondSimilarityResults = diamondSimilarity(seqs, database)
+  gzip(sims.output_file.collectFile(), params.outputFile)
+
 }
