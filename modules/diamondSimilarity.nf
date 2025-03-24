@@ -2,6 +2,8 @@
 nextflow.enable.dsl=2
 
 process createDatabase {
+  container = 'veupathdb/diamondsimilarity:v1.0.0'
+
   input:
     path fasta
     val dbname
@@ -21,6 +23,8 @@ process createDatabase {
 }
 
 process diamondSimilarity {
+  container = 'veupathdb/diamondsimilarity:v1.0.0'
+
   input:
     path queryFasta
     path database
@@ -39,6 +43,8 @@ process diamondSimilarity {
 }
 
 process gzip {
+  container = 'veupathdb/diamondsimilarity:v1.0.0'
+
   publishDir params.outputDir, mode: 'copy'
 
   input:
