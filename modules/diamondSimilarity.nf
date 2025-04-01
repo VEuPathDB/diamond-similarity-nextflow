@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2
 
 process createDatabase {
-  container = 'veupathdb/diamondsimilarity:v1.0.0'
+  container = 'veupathdb/diamondsimilarity:1.0.0'
 
   input:
     path fasta
@@ -23,7 +23,7 @@ process createDatabase {
 }
 
 process diamondSimilarity {
-  container = 'veupathdb/diamondsimilarity:v1.0.0'
+  container = 'veupathdb/diamondsimilarity:1.0.0'
 
   input:
     path queryFasta
@@ -43,7 +43,7 @@ process diamondSimilarity {
 }
 
 process gzip {
-  container = 'veupathdb/diamondsimilarity:v1.0.0'
+  container = 'veupathdb/diamondsimilarity:1.0.0'
 
   publishDir params.outputDir, mode: 'copy'
 
