@@ -78,7 +78,7 @@ workflow preConfiguredDatabase {
     database
 
   main:
-  sims = diamondSimilarityResults = diamondSimilarity(seqs, database)
+  sims = diamondSimilarity(seqs, database)
   gzip(sims.output_file.collectFile(), params.outputFile)
 
 }
